@@ -19,7 +19,6 @@ binwrite = "0.2.1"
 hash40 = "0.4.4"
 
 serde = { version = "1", features = ["derive"], optional = true }
-lazy_static = { version = "1", optional = true }
 
 # Only for the CLI
 structopt = { version = "0.3", optional = true }
@@ -27,4 +26,4 @@ serde_yaml = { version = "0.8", optional = true }
 
 [features]
 cli = ["structopt", "derive_serde", "serde_yaml"]
-derive_serde = ["serde", "lazy_static"]
+derive_serde = ["serde"]
