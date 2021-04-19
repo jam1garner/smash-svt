@@ -1,5 +1,5 @@
-//! A Rust library for working with `soundlabelinfo.sli` files from Smash Ultimate. This allows for
-//! modifying various properties associated with  background music.
+//! A Rust library for working with `commonsoundtable.csb` files from Smash Ultimate. This allows
+//! for modifying which common sounds are loaded for which characters
 
 use binread::{BinRead, BinReaderExt, derive_binread};
 use binwrite::{BinWrite, WriterOption};
@@ -11,110 +11,67 @@ use std::io::{self, Read, Seek, Write, BufReader, BufWriter};
 #[cfg(feature = "derive_serde")]
 use serde::{Serialize, Deserialize};
 
-#[cfg(feature = "derive_serde")]
-mod hash40;
-
-/// Type alias for Hash40
-pub type Hash40 = u64;
+pub use hash40;
+use hash40::Hash40;
 
 pub use binread::{BinResult as Result, Error};
 
 #[derive_binread]
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
-#[br(magic = b"SLI\0\x01\0\0\0")]
-pub struct SliFile (
+#[br(magic = b"CSB\0\x01\0\0\0")]
+pub struct CsbFile (
     #[br(temp)]
-    u32,
+    u16,
 
-    #[br(count = self_0)]
+    #[br(temp)]
+    u16,
+
+    #[br(count = self_1, args(self_0))]
     Vec<Entry>,
 );
 
-impl BinWrite for SliFile {
+impl BinWrite for CsbFile {
     fn write_options<W: Write>(&self, writer: &mut W, options: &WriterOption) -> io::Result<()> {
-        let mut entries = self.0.clone();
-        entries.sort_unstable_by(|a, b| a.tone_name.cmp(&b.tone_name));
+        let entries = self.0.clone();
+        //entries.sort_unstable_by(|a, b| a.character_names.cmp(&b.tone_name));
 
         (
-            "SLI\0\x01\0\0\0",
-            self.0.len() as u32,
+            b"CSB\0\x01\0\0\0",
+            self.0.get(0).map(|entry| entry.sounds.len()).unwrap_or(0) as u16,
+            self.0.len() as u16,
             entries
         ).write_options(writer, options)
     }
 }
 
-/// An entry representing a single nus3audio background music file
+/// An entry representing a character's
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(BinRead, BinWrite, Debug, Clone)]
+#[br(import(sound_count: u16))]
 pub struct Entry {
-    #[cfg_attr(feature = "derive_serde", serde(with = "serde_hash40"))]
-    pub tone_name: Hash40,
-    pub nus3bank_id: u32,
-    pub tone_id: u32,
+    #[br(map = Hash40)]
+    #[binwrite(preprocessor(hash40_to_u64))]
+    pub character_name: Hash40,
+
+    #[br(count = sound_count, map = hash40_vec)]
+    #[binwrite(preprocessor(vec_hash40))]
+    pub sounds: Vec<Hash40>,
 }
 
-#[cfg(feature = "derive_serde")]
-pub fn set_labels<P: AsRef<Path>>(path: P) -> Result<()> {
-    fn inner(path: &Path) -> Result<()> {
-        let contents = std::fs::read_to_string(path)?;
-        let labels = contents.split("\n")
-            .map(|string| (hash40::hash40(string.trim()), string.to_owned()))
-            .collect();
-
-        *serde_hash40::LABELS.lock().unwrap() = labels;
-
-        Ok(())
-    }
-
-    inner(path.as_ref())
+fn hash40_to_u64(&Hash40(x): &Hash40) -> u64 {
+    x
 }
 
-#[cfg(feature = "derive_serde")]
-mod serde_hash40 {
-    use std::{
-        sync::Mutex,
-        collections::HashMap,
-    };
-
-    lazy_static::lazy_static! {
-        pub static ref LABELS: Mutex<HashMap<Hash40, String>> = Mutex::new(HashMap::new());
-    }
-
-    use super::{hash40::hash40, Hash40};
-    use serde::{Deserialize, Deserializer, Serializer};
-
-    pub fn deserialize<'de, D, E>(deserializer: D) -> Result<u64, D::Error>
-    where
-        D: Deserializer<'de, Error = E>,
-        E: serde::de::Error,
-    {
-        let s: String = Deserialize::deserialize(deserializer)?;
-
-        if s.starts_with("0x") {
-            u64::from_str_radix(s.trim_start_matches("0x"), 16)
-                .map_err(|_| D::Error::custom(format!("{} is an invalid Hash40", s)))
-        } else {
-            Ok(hash40(&s))
-        }
-    }
-
-    pub fn serialize<S>(hash40: &Hash40, serializer: S) -> Result<S::Ok, S::Error> 
-        where S: Serializer,
-    {
-        match LABELS.lock().unwrap().get(hash40) {
-            Some(label) => {
-                serializer.serialize_str(&label)
-            }
-            None => {
-                serializer.serialize_str(&format!("{:#x}", hash40))
-            }
-        }
-    }
+fn hash40_vec(x: Vec<u64>) -> Vec<Hash40> {
+    x.into_iter().map(Hash40).collect()
 }
 
+fn vec_hash40(x: &Vec<Hash40>) -> Vec<u64> {
+    x.iter().map(|&Hash40(x)| x).collect()
+}
 
-impl SliFile {
+impl CsbFile {
     pub fn read<R: Read + Seek>(reader: &mut R) -> Result<Self> {
         reader.read_le()
     }
@@ -133,7 +90,7 @@ impl SliFile {
     }
 
     pub fn new(entries: Vec<Entry>) -> Self {
-        SliFile(entries)
+        CsbFile(entries)
     }
 
     pub fn entries(&self) -> &[Entry] {
@@ -142,24 +99,5 @@ impl SliFile {
 
     pub fn entries_mut(&mut self) -> &mut Vec<Entry> {
         &mut self.0
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_round_trip() {
-        let original = std::fs::read("soundlabelinfo.sli").unwrap();
-        let bgm_property = SliFile::open("soundlabelinfo.sli").unwrap();
-
-        println!("{:#X?}", bgm_property);
-
-        let mut round_trip = Vec::new();
-        bgm_property.write(&mut round_trip).unwrap();
-
-        assert_eq!(original, round_trip);
-        //bgm_property.save("bgm_property_out.bin").unwrap();
     }
 }

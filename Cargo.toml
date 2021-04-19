@@ -1,21 +1,22 @@
 [package]
-name = "smash-sli"
+name = "smash-csb"
 version = "0.8.0"
 authors = ["jam1garner <8260240+jam1garner@users.noreply.github.com>"]
 edition = "2018"
 
 [lib]
-name = "sli"
+name = "csb"
 path = "src/lib.rs"
 
 [[bin]]
-name = "sli"
+name = "csb"
 path = "src/main.rs"
 required-features = ["cli"]
 
 [dependencies]
 binread = "1.4.0"
 binwrite = "0.2.1"
+hash40 = "0.4.4"
 
 serde = { version = "1", features = ["derive"], optional = true }
 lazy_static = { version = "1", optional = true }
