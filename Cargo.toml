@@ -1,22 +1,21 @@
 [package]
-name = "smash-csb"
+name = "smash-fnv"
 version = "0.8.0"
 authors = ["jam1garner <8260240+jam1garner@users.noreply.github.com>"]
 edition = "2018"
 
 [lib]
-name = "csb"
+name = "fnv"
 path = "src/lib.rs"
 
 [[bin]]
-name = "csb"
+name = "fnv"
 path = "src/main.rs"
 required-features = ["cli"]
 
 [dependencies]
 binread = "1.4.0"
 binwrite = "0.2.1"
-hash40 = "0.4.4"
 
 serde = { version = "1", features = ["derive"], optional = true }
 
