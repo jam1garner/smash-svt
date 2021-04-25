@@ -1,7 +1,7 @@
 use fnv::FnvFile;
 use structopt::StructOpt;
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs;
 
 #[derive(StructOpt)]

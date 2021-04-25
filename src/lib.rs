@@ -41,7 +41,7 @@ impl BinWrite for FnvFile {
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(BinRead, BinWrite, Debug, Clone)]
 pub struct Entry {
-    id: u32,
+    fighters: u32,
     vols: [f32; 8]
 }
 
