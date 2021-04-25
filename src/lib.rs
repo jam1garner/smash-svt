@@ -41,8 +41,21 @@ impl BinWrite for FnvFile {
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(BinRead, BinWrite, Debug, Clone)]
 pub struct Entry {
-    fighters: u32,
-    vols: [f32; 8]
+    pub fighters: u32,
+    pub volumes: Volumes,
+}
+
+#[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
+#[derive(BinRead, BinWrite, Debug, Clone)]
+pub struct Volumes {
+    pub other: f32,
+    pub sound_attr: f32,
+    pub se_fighter_step: f32,
+    pub se_fighter_landing: f32,
+    pub se_collision_step: f32,
+    pub se_collision_landing: f32,
+    pub se_stage: f32,
+    pub bgm: f32,
 }
 
 impl FnvFile {
