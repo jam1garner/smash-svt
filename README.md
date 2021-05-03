@@ -32,6 +32,12 @@ Convert back:
 svt svt.yaml sound_volume_table.svt
 ```
 
+### CLI Install (Linux/Mac OS/etc)
+
+```
+cargo install --git https://github.com/jam1garner/smash-svt --features=cli
+```
+
 ### Example Library Usage
 
 ```rust
