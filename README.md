@@ -1,17 +1,15 @@
-# smash-fnv
+# smash-svt
 
-A Rust library/CLI for working with sound_volume_fighter_num_table.fnv files in Smash Ultimate 
-
-(fnv not to be confused with Fowler–Noll–Vo, which was made use of in previous entries of the game)
+A Rust library/CLI for working with sound_volume_table.svt files in Smash Ultimate 
 
 ### Example CLI usage
 
 ```
-smash-fnv 0.8.0
-A tool for converting between Smash Ultimate 'sound volume fighter num table' files and yaml
+smash-svt 0.8.0
+A tool for converting between Smash Ultimate 'sound volume table' files and yaml
 
 USAGE:
-    fnv <in-file> <out-file>
+    svt <in-file> <out-file>
 
 FLAGS:
     -h, --help       Prints help information
@@ -25,26 +23,25 @@ ARGS:
 Convert to yaml:
 
 ```
-fnv sound_volume_fighter_num_table.fnv fnv.yaml
+svt sound_volume_table.svt svt.yaml
 ```
 
 Convert back:
 
 ```
-fnv fnv.yaml sound_volume_fighter_num_table.fnv
+svt svt.yaml sound_volume_table.svt
 ```
-
 
 ### Example Library Usage
 
 ```rust
-use fnv::FnvFile;
+use svt::SvtFile;
 
-let mut file = FnvFile::open("sound_volume_fighter_num_table.fnv")?;
+let mut file = SvtFile::open("sound_volume_table.svt")?;
 
 for entry in file.entries() {
-    println!("{}: {:?}", entry.id, entry.vols);
+    println!("{}: {:?}", entry.id, entry.knobs);
 }
 
-file.save("sound_volume_fighter_num_table.fnv")?;
+file.save("sound_volume_table.svt")?;
 ```

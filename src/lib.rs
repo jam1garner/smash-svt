@@ -15,8 +15,8 @@ pub use binread::{BinResult as Result, Error};
 #[derive_binread]
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
-#[br(magic = b"FNV\0\x01\0\0\0")]
-pub struct FnvFile (
+#[br(magic = b"SVT\0\x01\0\0\0")]
+pub struct SvtFile (
     #[br(temp)]
     u32,
 
@@ -24,41 +24,27 @@ pub struct FnvFile (
     Vec<Entry>,
 );
 
-impl BinWrite for FnvFile {
+impl BinWrite for SvtFile {
     fn write_options<W: Write>(&self, writer: &mut W, options: &WriterOption) -> io::Result<()> {
         let entries = self.0.clone();
-        //entries.sort_unstable_by(|a, b| a.character_names.cmp(&b.tone_name));
 
         (
-            b"FNV\0\x01\0\0\0",
+            b"SVT\0\x01\0\0\0",
             self.0.len() as u32,
             entries
         ).write_options(writer, options)
     }
 }
 
-/// An entry representing a character's
+/// An entry in the sound volume table
 #[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
 #[derive(BinRead, BinWrite, Debug, Clone)]
 pub struct Entry {
-    pub fighters: u32,
-    pub volumes: Volumes,
+    id: u32,
+    knobs: [f32; 4],
 }
 
-#[cfg_attr(feature = "derive_serde", derive(Serialize, Deserialize))]
-#[derive(BinRead, BinWrite, Debug, Clone)]
-pub struct Volumes {
-    pub other: f32,
-    pub sound_attr: f32,
-    pub se_fighter_step: f32,
-    pub se_fighter_landing: f32,
-    pub se_collision_step: f32,
-    pub se_collision_landing: f32,
-    pub se_stage: f32,
-    pub bgm: f32,
-}
-
-impl FnvFile {
+impl SvtFile {
     pub fn read<R: Read + Seek>(reader: &mut R) -> Result<Self> {
         reader.read_le()
     }
@@ -77,7 +63,7 @@ impl FnvFile {
     }
 
     pub fn new(entries: Vec<Entry>) -> Self {
-        FnvFile(entries)
+        SvtFile(entries)
     }
 
     pub fn entries(&self) -> &[Entry] {

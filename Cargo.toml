@@ -1,15 +1,15 @@
 [package]
-name = "smash-fnv"
-version = "0.9.0"
+name = "smash-svt"
+version = "0.8.0"
 authors = ["jam1garner <8260240+jam1garner@users.noreply.github.com>"]
 edition = "2018"
 
 [lib]
-name = "fnv"
+name = "svt"
 path = "src/lib.rs"
 
 [[bin]]
-name = "fnv"
+name = "svt"
 path = "src/main.rs"
 required-features = ["cli"]
 
