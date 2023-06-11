@@ -1,53 +1,33 @@
-# smash-svt
+# svt_lib
 
-A Rust library/CLI for working with sound_volume_table.svt files in Smash Ultimate 
+A Rust library for reading and writing `sound_volume_table.svt` files from Super Smash Bros. for Nintendo 3DS and Wii U and Super Smash Bros. Ultimate.
 
-### Example CLI usage
+## svt_yaml
 
-```
-smash-svt 0.8.0
-A tool for converting between Smash Ultimate 'sound volume table' files and yaml
+A command-line program for creating and editing `sound_volume_table.svt` files using YAML. Drag and drop a `sound_volume_table.svt` file onto the executable to create a YAML file. Drag and drop a properly structured YAML file onto the executable to create a `sound_volume_table.svt` file. YAML files are text files, so they can be viewed and edited in any text editor.
 
-USAGE:
-    svt <in-file> <out-file>
+Sample output from a `sound_volume_table.svt` file:
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-ARGS:
-    <in-file>
-    <out-file>
-```
-
-Convert to yaml:
-
-```
-svt sound_volume_table.svt svt.yaml
+```yaml
+entries:
+- id: 0
+  knobs:
+  - 0.0
+  - -1.0
+  - 0.0
+  - -1.5
+- id: 1
+  knobs:
+  - 0.2
+  - -0.8
+  - 0.0
+  - -0.7
 ```
 
-Convert back:
+### Usage
 
-```
-svt svt.yaml sound_volume_table.svt
-```
+The latest prebuilt binary for Windows is available in [Releases](https://github.com/jam1garner/smash-svt/releases/latest).
 
-### CLI Install (Linux/Mac OS/etc)
-
-```
-cargo install --git https://github.com/jam1garner/smash-svt --features=cli
-```
-
-### Example Library Usage
-
-```rust
-use svt::SvtFile;
-
-let mut file = SvtFile::open("sound_volume_table.svt")?;
-
-for entry in file.entries() {
-    println!("{}: {:?}", entry.id, entry.knobs);
-}
-
-file.save("sound_volume_table.svt")?;
-```
+`svt_yaml <input> [output]`<br>
+`svt_yaml sound_volume_table.svt sound_volume_table.yaml`<br>
+`svt_yaml sound_volume_table.yaml sound_volume_table.svt`<br>

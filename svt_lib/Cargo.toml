@@ -1,0 +1,15 @@
+[package]
+name = "svt_lib"
+version = "0.9.0"
+authors = ["jam1garner <8260240+jam1garner@users.noreply.github.com>"]
+edition = "2021"
+description = "Reading and writing sound_volume_table.svt files"
+repository = "https://github.com/jam1garner/smash-svt"
+license = "MIT"
+
+[dependencies]
+binrw = "0.11"
+serde = { version = "1.0", features = ["derive"], optional = true }
+
+[features]
+serde = ["dep:serde"]
