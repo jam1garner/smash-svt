@@ -4,7 +4,7 @@ use std::{
 };
 
 use clap::Parser;
-use svt_lib::SvtFile;
+use smash_svt::SvtFile;
 
 /// Convert sound_volume_table.svt files to and from YAML
 #[derive(Parser)]

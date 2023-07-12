@@ -6,5 +6,5 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.3", features = ["derive"] }
-svt_lib = { path = "../svt_lib", features = ["serde"] }
+smash-svt = { path = "../smash-svt", features = ["serde"] }
 serde_yaml = { version = "0.9" }

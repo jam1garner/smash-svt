@@ -1,2 +1,2 @@
 [workspace]
-members = ["svt_lib", "svt_yaml"]
+members = ["smash-svt", "svt_yaml"]
