@@ -1,6 +1,10 @@
-# svt_lib
+# smash-svt
 
 A Rust library for reading and writing `sound_volume_table.svt` files from Super Smash Bros. for Nintendo 3DS and Wii U and Super Smash Bros. Ultimate.
+
+```
+cargo add smash-svt
+```
 
 ## svt_yaml
 
